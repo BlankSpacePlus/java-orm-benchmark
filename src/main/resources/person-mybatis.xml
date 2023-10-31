@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blankspace.orm.pojo.Person">
+    <!--增-->
+    <insert id="add_new_person" parameterType="com.blankspace.orm.pojo.Person" useGeneratedKeys="true">
+        insert into `person` values (#{id}, #{name}, #{phone}, #{email}, #{company}, #{address});
+    </insert>
+    <!--删-->
+    <delete id="delete_person_by_id" parameterType="int">
+        delete from `person` where id=#{personId};
+    </delete>
+    <!--改-->
+    <update id="update_existed_person" parameterType="com.blankspace.orm.pojo.Person" useGeneratedKeys="true">
+        update `person` set name=#{name}, phone=#{phone}, email=#{email}, company=#{company}, address=#{address} where id=#{id};
+    </update>
+    <!--查-->
+    <select id="query_person_by_id" parameterType="int" resultType="com.blankspace.orm.pojo.Person">
+        select * from `person` where id = #{personId};
+    </select>
+</mapper>
