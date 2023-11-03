@@ -1,12 +1,18 @@
 package com.blankspace.orm.dao;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
-import org.apache.ibatis.io.Resources;
+import javax.sql.DataSource;
+
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 import com.blankspace.orm.pojo.Person;
 
@@ -14,14 +20,35 @@ public class PersonMyBatisDao implements PersonDaoInterface {
 
     private volatile static PersonDaoInterface daoInstance;
 
-    private PersonMyBatisDao() {
+    private final SqlSessionFactory sqlSessionFactory;
+
+    private PersonMyBatisDao(DataSource dataSource) {
+        TransactionFactory transactionFactory = new JdbcTransactionFactory();
+        Environment environment = new Environment("development", transactionFactory, dataSource);
+        Configuration conf = new Configuration(environment);
+        String mapperLocation = "src/main/resources/";
+        File mappersFile = new File(mapperLocation);
+        File[] mappers = mappersFile.listFiles(pathname -> pathname.getName().endsWith("Mapper.xml"));
+        if (mappers != null) {
+            for (File mapper : mappers) {
+                try {
+                    FileInputStream is = new FileInputStream(mapper);
+                    XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(is, conf, mapper.getAbsolutePath(), conf.getSqlFragments());
+                    xmlMapperBuilder.parse();
+                    is.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(conf);
     }
 
-    public static PersonDaoInterface getInstance() {
+    public static PersonDaoInterface getInstance(DataSource dataSource) {
         if (daoInstance == null) {
             synchronized (PersonMyBatisDao.class) {
                 if (daoInstance == null) {
-                    daoInstance = new PersonMyBatisDao();
+                    daoInstance = new PersonMyBatisDao(dataSource);
                 }
             }
         }
@@ -30,72 +57,41 @@ public class PersonMyBatisDao implements PersonDaoInterface {
 
     @Override
     public void addNewPerson(Person person) {
-        // 读取配置文件
-        try (InputStream in = Resources.getResourceAsStream("mybatis-config.xml")) {
-            // 初始化mybatis，创建SqlSessionFactory类实例
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(in);
-            // 创建Session实例
-            try (SqlSession session = sqlSessionFactory.openSession()) {
-                // 插入新数据
-                session.insert("com.blankspace.orm.pojo.Person.add_new_person", person);
-                // 提交事务
-                session.commit();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        try (SqlSession session = this.sqlSessionFactory.openSession()) {
+            // 插入新数据
+            session.insert("com.blankspace.orm.pojo.Person.addNewPerson", person);
+            // 提交事务
+            session.commit();
         }
     }
 
     @Override
     public void deletePersonById(int personId) {
-        // 读取配置文件
-        try (InputStream in = Resources.getResourceAsStream("mybatis-config.xml")) {
-            // 初始化mybatis，创建SqlSessionFactory类实例
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(in);
-            // 创建Session实例
-            try (SqlSession session = sqlSessionFactory.openSession()) {
-                // 删除数据
-                session.delete("com.blankspace.orm.pojo.Person.delete_person_by_id", personId);
-                // 提交事务
-                session.commit();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        try (SqlSession session = this.sqlSessionFactory.openSession()) {
+            // 删除数据
+            session.delete("com.blankspace.orm.pojo.Person.deletePersonById", personId);
+            // 提交事务
+            session.commit();
         }
     }
 
     @Override
     public void updateExistedPerson(Person person) {
-        // 读取配置文件
-        try (InputStream in = Resources.getResourceAsStream("mybatis-config.xml")) {
-            // 初始化mybatis，创建SqlSessionFactory类实例
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(in);
-            // 创建Session实例
-            try (SqlSession session = sqlSessionFactory.openSession()) {
-                // 删除数据
-                session.delete("com.blankspace.orm.pojo.Person.update_existed_person", person);
-                // 提交事务
-                session.commit();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        try (SqlSession session = this.sqlSessionFactory.openSession()) {
+            // 删除数据
+            session.delete("com.blankspace.orm.pojo.Person.updateExistedPerson", person);
+            // 提交事务
+            session.commit();
         }
     }
 
     @Override
     public Person queryPersonById(int personId) {
-        Person person = null;
-        // 读取配置文件
-        try (InputStream in = Resources.getResourceAsStream("mybatis-config.xml")) {
-            // 初始化mybatis，创建SqlSessionFactory类实例
-            SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(in);
-            // 创建Session实例
-            try (SqlSession session = sqlSessionFactory.openSession()) {
-                // 从数据库中检索一条数据
-                person = session.selectOne("com.blankspace.orm.pojo.Person.query_person_by_id", personId);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        Person person;
+        // 创建Session实例
+        try (SqlSession session = this.sqlSessionFactory.openSession()) {
+            // 从数据库中检索一条数据
+            person = session.selectOne("com.blankspace.orm.pojo.Person.queryPersonById", personId);
         }
         return person;
     }

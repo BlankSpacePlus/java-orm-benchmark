@@ -1,15 +1,11 @@
 package com.blankspace.orm.dao;
 
-import static com.blankspace.orm.util.OrmHelper.DATABASE_URL;
-import static com.blankspace.orm.util.OrmHelper.DRIVER_NAME;
-import static com.blankspace.orm.util.OrmHelper.USER_NAME;
-import static com.blankspace.orm.util.OrmHelper.USER_PASSWORD;
-
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 import com.blankspace.orm.pojo.Person;
 
@@ -17,32 +13,29 @@ public class PersonJdbcDao implements PersonDaoInterface {
 
     private volatile static PersonDaoInterface daoInstance;
 
-    private PersonJdbcDao() {
+    private PersonJdbcDao(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public static PersonDaoInterface getInstance() {
+    public static PersonDaoInterface getInstance(DataSource dataSource) {
         if (daoInstance == null) {
             synchronized (PersonJdbcDao.class) {
                 if (daoInstance == null) {
-                    daoInstance = new PersonJdbcDao();
+                    daoInstance = new PersonJdbcDao(dataSource);
                 }
             }
         }
         return daoInstance;
     }
 
+    private final DataSource dataSource;
+
     @Override
     public void addNewPerson(Person person) {
-        // 查找数据库驱动
-        try {
-            Class.forName(DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         // 编写SQL语句
         String sql = "insert into `person` values (?, ?, ?, ?, ?, ?)";
         // 连接数据库并进行操作
-        try (Connection dbConnection = DriverManager.getConnection(DATABASE_URL, USER_NAME, USER_PASSWORD);
+        try (Connection dbConnection = this.dataSource.getConnection();
              PreparedStatement preparedStatement = dbConnection.prepareStatement(sql)) {
             preparedStatement.setInt(1, person.getId());
             preparedStatement.setString(2, person.getName());
@@ -58,16 +51,10 @@ public class PersonJdbcDao implements PersonDaoInterface {
 
     @Override
     public void deletePersonById(int personId) {
-        // 查找数据库驱动
-        try {
-            Class.forName(DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         // 编写SQL语句
         String sql = "delete from `person` where id=?";
         // 连接数据库并进行操作
-        try (Connection dbConnection = DriverManager.getConnection(DATABASE_URL, USER_NAME, USER_PASSWORD);
+        try (Connection dbConnection = this.dataSource.getConnection();
              PreparedStatement preparedStatement = dbConnection.prepareStatement(sql)) {
             preparedStatement.setInt(1, personId);
             preparedStatement.executeUpdate();
@@ -78,16 +65,10 @@ public class PersonJdbcDao implements PersonDaoInterface {
 
     @Override
     public void updateExistedPerson(Person person) {
-        // 查找数据库驱动
-        try {
-            Class.forName(DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         // 编写SQL语句
         String sql = "update `person` set name=?, phone=?, email=?, company=?, address=? where id=?";
         // 连接数据库并进行操作
-        try (Connection dbConnection = DriverManager.getConnection(DATABASE_URL, USER_NAME, USER_PASSWORD);
+        try (Connection dbConnection = this.dataSource.getConnection();
              PreparedStatement preparedStatement = dbConnection.prepareStatement(sql)) {
             int personId = person.getId();
             String personName = person.getName();
@@ -109,16 +90,10 @@ public class PersonJdbcDao implements PersonDaoInterface {
 
     @Override
     public Person queryPersonById(int personId) {
-        // 查找数据库驱动
-        try {
-            Class.forName(DRIVER_NAME);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         // 编写SQL语句
         String sql = "select id, name, phone, email, company, address from `person` where id = ?";
         // 连接数据库并进行操作
-        try (Connection dbConnection = DriverManager.getConnection(DATABASE_URL, USER_NAME, USER_PASSWORD);
+        try (Connection dbConnection = this.dataSource.getConnection();
              PreparedStatement preparedStatement = dbConnection.prepareStatement(sql)) {
             preparedStatement.setInt(1, personId);
             ResultSet resultSet = preparedStatement.executeQuery();

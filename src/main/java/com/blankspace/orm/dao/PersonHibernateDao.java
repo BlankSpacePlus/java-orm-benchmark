@@ -11,7 +11,14 @@ public class PersonHibernateDao implements PersonDaoInterface {
 
     private volatile static PersonDaoInterface daoInstance;
 
+    private Configuration config;
+
+    private SessionFactory sessionFactory;
+
     private PersonHibernateDao() {
+        // 创建Configuration对象并加载hibernate.cfg.xml配置文件
+        this.config = new Configuration().configure("hibernate-config.xml");
+        this.sessionFactory = config.buildSessionFactory();
     }
 
     public static PersonDaoInterface getInstance() {
@@ -25,13 +32,14 @@ public class PersonHibernateDao implements PersonDaoInterface {
         return daoInstance;
     }
 
+    public void close() {
+        this.sessionFactory.close();
+    }
+
     @Override
     public void addNewPerson(Person person) {
-        // 创建Configuration对象并加载hibernate.cfg.xml配置文件
-        Configuration config = new Configuration().configure();
         // 获取SessionFactory和Session对象
-        try (SessionFactory sessionFactory = config.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             // 开启事务
             Transaction transaction = session.beginTransaction();
             // 将创建的对象保存到表中
@@ -45,11 +53,8 @@ public class PersonHibernateDao implements PersonDaoInterface {
 
     @Override
     public void deletePersonById(int personId) {
-        // 创建Configuration对象并加载hibernate.cfg.xml配置文件
-        Configuration config = new Configuration().configure();
         // 获取SessionFactory和Session对象
-        try (SessionFactory sessionFactory = config.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             // 开启事务
             Transaction transaction = session.beginTransaction();
             // 获取待删除的Person实例
@@ -65,11 +70,8 @@ public class PersonHibernateDao implements PersonDaoInterface {
 
     @Override
     public void updateExistedPerson(Person person) {
-        // 创建Configuration对象并加载hibernate.cfg.xml配置文件
-        Configuration config = new Configuration().configure();
         // 获取SessionFactory和Session对象
-        try (SessionFactory sessionFactory = config.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             // 开启事务
             Transaction transaction = session.beginTransaction();
             // 将待更新的Person数据保存到表中
@@ -83,12 +85,9 @@ public class PersonHibernateDao implements PersonDaoInterface {
 
     @Override
     public Person queryPersonById(int personId) {
-        // 创建Configuration对象并加载hibernate.cfg.xml配置文件
-        Configuration config = new Configuration().configure();
         Person person = null;
         // 获取SessionFactory和Session对象
-        try (SessionFactory sessionFactory = config.buildSessionFactory();
-             Session session = sessionFactory.openSession()) {
+        try (Session session = sessionFactory.openSession()) {
             // 开启事务
             Transaction transaction = session.beginTransaction();
             // 获取目标Person实例
