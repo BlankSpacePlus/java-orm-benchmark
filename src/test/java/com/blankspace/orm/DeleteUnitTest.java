@@ -1,5 +1,7 @@
 package com.blankspace.orm;
 
+import static com.blankspace.orm.util.OrmHelper.DATA_SOURCE;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ public class DeleteUnitTest {
 
     @Test
     public void deleteByJdbc() {
-        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance();
+        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance(DATA_SOURCE);
         Person originPerson = jdbcDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(originPerson);
         jdbcDaoInstance.deletePersonById(501);
@@ -23,7 +25,7 @@ public class DeleteUnitTest {
 
     @Test
     public void deleteByMyBatis() {
-        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance();
+        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance(DATA_SOURCE);
         Person originPerson = mybatisDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(originPerson);
         mybatisDaoInstance.deletePersonById(501);

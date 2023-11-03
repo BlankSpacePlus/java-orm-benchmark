@@ -1,5 +1,7 @@
 package com.blankspace.orm;
 
+import static com.blankspace.orm.util.OrmHelper.DATA_SOURCE;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +15,7 @@ public class QueryUnitTest {
 
     @Test
     public void queryByJdbc() {
-        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance();
+        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance(DATA_SOURCE);
         Person expectedPerson = new Person(255, "Cassady Stephens", "1-695-201-2887", "aliquet.phasellus@outlook.net", "Integer Aliquam Adipiscing LLP", "820-2640 Tempus Av.");
         Person actualPerson = jdbcDaoInstance.queryPersonById(255);
         Assertions.assertEquals(expectedPerson, actualPerson);
@@ -21,7 +23,7 @@ public class QueryUnitTest {
 
     @Test
     public void queryByMyBatis() {
-        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance();
+        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance(DATA_SOURCE);
         Person expectedPerson = new Person(255, "Cassady Stephens", "1-695-201-2887", "aliquet.phasellus@outlook.net", "Integer Aliquam Adipiscing LLP", "820-2640 Tempus Av.");
         Person actualPerson = mybatisDaoInstance.queryPersonById(255);
         Assertions.assertEquals(expectedPerson, actualPerson);

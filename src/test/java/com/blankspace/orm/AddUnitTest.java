@@ -1,5 +1,7 @@
 package com.blankspace.orm;
 
+import static com.blankspace.orm.util.OrmHelper.DATA_SOURCE;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +15,8 @@ public class AddUnitTest {
 
     @Test
     public void addByJdbc() {
-        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(819) 689-3550","sem.egestas.blandit@google.net","Mauris Sagittis Placerat LLC","Ap #549-2739 Eget Rd.");
+        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance(DATA_SOURCE);
+        Person expectedPerson = new Person(501, "Hayes Manning", "(819) 689-3550", "sem.egestas.blandit@google.net", "Mauris Sagittis Placerat LLC", "Ap #549-2739 Eget Rd.");
         jdbcDaoInstance.addNewPerson(expectedPerson);
         Person actualPerson = jdbcDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);
@@ -23,8 +25,8 @@ public class AddUnitTest {
 
     @Test
     public void addByMyBatis() {
-        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(819) 689-3550","sem.egestas.blandit@google.net","Mauris Sagittis Placerat LLC","Ap #549-2739 Eget Rd.");
+        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance(DATA_SOURCE);
+        Person expectedPerson = new Person(501, "Hayes Manning", "(819) 689-3550", "sem.egestas.blandit@google.net", "Mauris Sagittis Placerat LLC", "Ap #549-2739 Eget Rd.");
         mybatisDaoInstance.addNewPerson(expectedPerson);
         Person actualPerson = mybatisDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);
@@ -34,7 +36,7 @@ public class AddUnitTest {
     @Test
     public void addByHibernate() {
         PersonDaoInterface hibernateDaoInstance = PersonHibernateDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(819) 689-3550","sem.egestas.blandit@google.net","Mauris Sagittis Placerat LLC","Ap #549-2739 Eget Rd.");
+        Person expectedPerson = new Person(501, "Hayes Manning", "(819) 689-3550", "sem.egestas.blandit@google.net", "Mauris Sagittis Placerat LLC", "Ap #549-2739 Eget Rd.");
         hibernateDaoInstance.addNewPerson(expectedPerson);
         Person actualPerson = hibernateDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);

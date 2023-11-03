@@ -1,5 +1,7 @@
 package com.blankspace.orm;
 
+import static com.blankspace.orm.util.OrmHelper.DATA_SOURCE;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +15,8 @@ public class UpdateUnitTest {
 
     @Test
     public void updateByJdbc() {
-        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(349) 280-4621","sem.egestas.blandit@google.net","Enim Etiam Imperdiet LLC","6381 Semper Ave");
+        PersonDaoInterface jdbcDaoInstance = PersonJdbcDao.getInstance(DATA_SOURCE);
+        Person expectedPerson = new Person(501, "Hayes Manning", "(349) 280-4621", "sem.egestas.blandit@google.net", "Enim Etiam Imperdiet LLC", "6381 Semper Ave");
         jdbcDaoInstance.updateExistedPerson(expectedPerson);
         Person actualPerson = jdbcDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);
@@ -23,8 +25,8 @@ public class UpdateUnitTest {
 
     @Test
     public void updateByMyBatis() {
-        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(349) 280-4621","sem.egestas.blandit@google.net","Enim Etiam Imperdiet LLC","6381 Semper Ave");
+        PersonDaoInterface mybatisDaoInstance = PersonMyBatisDao.getInstance(DATA_SOURCE);
+        Person expectedPerson = new Person(501, "Hayes Manning", "(349) 280-4621", "sem.egestas.blandit@google.net", "Enim Etiam Imperdiet LLC", "6381 Semper Ave");
         mybatisDaoInstance.updateExistedPerson(expectedPerson);
         Person actualPerson = mybatisDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);
@@ -34,7 +36,7 @@ public class UpdateUnitTest {
     @Test
     public void updateByHibernate() {
         PersonDaoInterface hibernateDaoInstance = PersonHibernateDao.getInstance();
-        Person expectedPerson = new Person(501, "Hayes Manning","(349) 280-4621","sem.egestas.blandit@google.net","Enim Etiam Imperdiet LLC","6381 Semper Ave");
+        Person expectedPerson = new Person(501, "Hayes Manning", "(349) 280-4621", "sem.egestas.blandit@google.net", "Enim Etiam Imperdiet LLC", "6381 Semper Ave");
         hibernateDaoInstance.updateExistedPerson(expectedPerson);
         Person actualPerson = hibernateDaoInstance.queryPersonById(501);
         Assertions.assertNotNull(actualPerson);
